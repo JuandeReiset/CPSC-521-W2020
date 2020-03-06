@@ -15,6 +15,30 @@ type FinalFunction = (Name, Arguments,FreeVars)
 
 type Table = ([FinalFunction],CallGraph)
 
+----start::
+----[Fun String String]
+----1 get listOf functions
+----2. make list of final functions
+----3. populate call graph
+----    globally or locally
+----4. create a function that updates freevars for each FinalFunction
+----5. apply function from 4 to the list of final functions
+----5. compare list of final functions to previous list of Final functions
+----6. if step 5 is such that both lists are equal, stop otherwise goto step 4
+
+--table compare
+    -- start with a Table of initial values (obtained from the lambdaLift function    
+    -- runUpdateVars on the table
+        --updateVars:: Table -> Table
+        -- updateVars does the following:
+        --for function_(n) in the list of FinalFunctions
+            -- for each function_(y) that calls function_(n) , add the freevariables of function_(n) to functions_(y)'s free variable list
+        -- send Table to tableCompare function.
+        --tableCompare:: Table -> Bool
+        -- if tableCompare == True then return table else run updateVars on table again.
+        
+        --tableCompare
+
 
 lambdaLift:: (Prog String String) -> Table
 lambdaLift prog = table where
@@ -51,7 +75,7 @@ lambdaFunction:: (Table, Fun String String) -> Table
 lambdaFunction (inTable, (Fun (name,args,exp))) = outTable where
         table1 = addFuncToTable inTable (funcToFF (Fun(name,args,exp)))     
         outTable = lambdaExpression (table1, (Fun(name,args,exp)), exp)
-        --func = (Fun (name,args,exp)) 
+        
             
 letLambdaFunctions:: (Table, [Fun String String]) -> Table
 letLambdaFunctions (table, []) = table
@@ -159,13 +183,6 @@ updateTableFreeVar (ffList, cList) (name,var) = table1 where
     newList = updateFFList ffList name var
     table1 = (newList,cList)
     
---updateFFList:: [FinalFunction] -> String -> String -> [FinalFunction]
---updateFFList ffList name var = map (\(n,args,vars) -> case (n == name) of 
---    True -> case (var `elem` vars) of 
---        True -> (n,args,vars) --error "The var is: " ++ var--
---        False ->  (n,args,(var:vars)) --error "Var plus list: " ++ (var:vars)--
---    False -> (n,args,vars)) ffList
- 
  
 updateFFList:: [FinalFunction] -> String -> String -> [FinalFunction]
 updateFFList [] name var = []
@@ -257,14 +274,7 @@ getAllFreeVars (f:ffs) = freeVars where
     var2 = getAllFreeVars ffs
     freeVars =  (var1 ++ var2)
 
---parseVarsDouble:: [String] -> [String] -> [String]
---parseVarsDouble [] [] = []
---parseVarsDouble a [] = oarseVarsSingle a
---parseVarsDouble [] a = parseVarsSingle a
---parseVarsDouble (l:list1) (list2) = list where
---    list = case (l `elem` list1) of 
---        True -> parseVarsDouble list1 list2
---        False -> parseVarsDouble list1 (l:list2)
+
 fixArgs:: [FinalFunction] -> [FinalFunction]
 fixArgs ffList = outList where
     outList = map (\(name, args, vars) -> (name, args ++ (vars \\ args), vars)) ffList
@@ -277,37 +287,5 @@ parseVars (l:list1) = l:(parseVars (filter (/= l) list1))  -- case (l `elem` lis
 
 extractVars:: FinalFunction -> [String]
 extractVars (name,args,vars) = filter (`notElem` args) vars
---varsOut where
---    varsOut = map(\var -> case (var `elem` args) of
---        True -> ""
---        False -> var) vars
-    
---flatten( map (\(nm,list) -> case (name == nm) of 
---    True -> list
---    False -> []) callG)
-            
---
---
-----start::
-----[Fun String String]
-----1 get listOf functions
-----2. make list of final functions
-----3. populate call graph
-----    globally or locally
-----4. create a function that updates freevars for each FinalFunction
-----5. apply function from 4 to the list of final functions
-----5. compare list of final functions to previous list of Final functions
-----6. if step 5 is such that both lists are equal, stop otherwise goto step 4
-
---table compare
-    -- start with a Table of initial values (obtained from the lambdaLift function    
-    -- runUpdateVars on the table
-        --updateVars:: Table -> Table
-        -- updateVars does the following:
-        --for function_(n) in the list of FinalFunctions
-            -- for each function_(y) that calls function_(n) , add the freevariables of function_(n) to functions_(y)'s free variable list
-        -- send Table to tableCompare function.
-        --tableCompare:: Table -> Bool
-        -- if tableCompare == True then return table else run updateVars on table again.
         
-        --tableCompare
+

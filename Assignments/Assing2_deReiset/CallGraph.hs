@@ -45,7 +45,7 @@ processExpression (callG, exp) = case exp of
     LET funcs exp1 -> (callGraph, expression) where      
         (cg1, expression) = processExpression(callG, exp1)
         (callGraph, fcns) = processListOfFuncs (cg1, funcs)               
-        --(callGraph, expression) = processExpression (cg2, exp1)        
+               
         
     APP name (e:exps) ->  (callGraph, expression) where
         (cg1) = updateCallGraph callG name
@@ -115,7 +115,7 @@ processBexpression (callG, exp) = case (exp) of
 updateCallGraph :: CallGraph -> String -> CallGraph
 updateCallGraph [] name = case (name == "f0") of
     True  -> [(name,[])]
-    False -> error "Malformed Program"
+    False -> error "Program is Malformed"
 updateCallGraph ((func,list):cg) name = case (name `elem` list) of 
     True -> ((func,list):cg)
     False -> ((func,name:list):cg)
@@ -133,7 +133,7 @@ letUpdate ((nm,list):cg) functions = graph where
     names = listOfNames functions   
     graph = ((nm, list1):cg)
     list1 = (mergeUnique names list)
-    --graph = ((nm, names ++ list1):cg) -- remove duplicates from list concat
+ 
 
 getGraphIndex:: String -> CallGraph -> Int
 getGraphIndex item list = fromJust (elemIndex item (map fst list))
